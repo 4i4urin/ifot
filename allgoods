@@ -1,0 +1,116 @@
+<?php
+session_start();
+require('sesion.php');
+require('linkmysql.php');
+?>
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Ифот</title>
+    <link rel="stylesheet" href="style.css" type="text/css">
+    <style>
+    IMG.displayed {
+      display: block;
+      margin-top: 15px;
+      margin-left: auto;
+      margin-right: auto;
+      width: 250px;
+      height: 250px;
+    }
+    </style>
+  </head>
+  <body>
+ <div class="logotype">
+   <p align="center">Some logotype</p>
+ </div>
+ <div id="main">
+   <a href="http://localhost/mysite/allgoods.php" class="head" style="margin-left: 0px;">
+     <p align="center">Все товары</p>
+   </a>
+   <a href="http://localhost/mysite/forwomen.php" class="head">
+     <p align="center">Женщинам</p>
+   </a>
+   <a href="http://localhost/mysite/formen.php" class="head">
+     <p align="center">Мужчинам</p>
+   </a>
+   <a href="http://localhost/mysite/forkids.php" class="head">
+     <p align="center">Детям</p>
+   </a>
+   <a href="http://localhost/mysite/others.php" class="head" style="margin-right: 0px; border-right: 2px solid blue;">
+     <p align="center">Другое</p>
+   </a>
+ </div>
+ <section class="group">
+  <div class="accaunt">
+    <h3 align="center"><?php if ($_SESSION['level'] > 0) {
+      echo "Привет ", $_SESSION['log'];
+      //echo "<br>","You come ", $_SESSION['date'];
+    ?> </h3>
+   <div class="search">
+     <a href="http://localhost/mysite/search.php"><h3 align="center">Поиск</h3><a>
+   </div>
+   <div class="quit">
+     <a href="http://localhost/mysite/logout.php">
+       <h3 align="center">Выход</h3>
+     </a>
+   </div>
+   <?php
+      } else {
+        echo "Вы не не за логинились", "<br>", "<a href='http://localhost/mysite/login/login.php'>Вы можите залогинется здесь</a>";
+        echo "<br>", "Если вы не зарегистрировались", "<a href='http://localhost/mysite/regestration/registration.php'> Вы можите зарегестрирваться здесь</a>";
+      } ?>
+    </h3>
+  </div>
+ <div class="content">
+   <?php
+   $sql = "SELECT COUNT(id) FROM goods";
+   $open = mysqli_query($link, $sql);
+   $res = mysqli_fetch_assoc($open);
+   $res = $res['COUNT(id)'] + 1;
+   for ($i=3; $i < $res ; $i++) {
+     $sql = "SELECT * FROM goods WHERE id='$i'";
+     $result = mysqli_query($link, $sql);
+     $row = mysqli_fetch_assoc($result);
+     if ($row['admin'] == 1) {
+     ?>
+     <a href="<?php echo $row['href']; ?>">
+      <div class="one_block">
+        <?php
+        $sql = "SELECT * FROM img WHERE id_goods='$i'";
+        $picture = mysqli_query($link, $sql);
+        $picture = mysqli_fetch_array($picture);
+        $img = $picture['content'];
+         ?>
+         <?php
+         if ($img != "NULL") { ?>
+           <img class="displayed" src="<?php echo "$img"; ?>" alt="some goods">
+         <?php } ?>
+       <h3><?php echo $row['name']; ?></h3>
+       <h3>Цена:
+         <?php
+          echo $row['cost'], " рублей";
+          ?>
+       </h3>
+       <h3>Рейтинг:
+         <?php
+          echo $row['rating'];
+           ?>
+        из 5</h3>
+      </div>
+    </a>
+  <?php }
+} ?>
+ </div>
+ </section>
+ <div class="footer">
+   <p align="center"> footer</p>
+   <?php if ($_SESSION['level'] === 3) { ?>
+   <a href="http://localhost/mysite/admin.php"><h3>ADMIN</h3></a>
+ <?php }
+ if ($_SESSION['level'] > 0) {?>
+   <a href="http://localhost/mysite/for_developer.php"><h3>Написать разработчику</h3></a>
+ <?php } ?>
+ </div>
+  </body>
+</html>
