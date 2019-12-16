@@ -1,0 +1,180 @@
+<?php
+session_start();
+require('sesion.php');
+require('linkmysql.php');
+if ($_SESSION['level'] === 3) {
+  $id = $_SESSION['id'];
+  unset($_SESSION['id']);
+  ?>
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <meta charset="utf-8">
+      <title>Ифот</title>
+      <link rel="stylesheet" href="style.css" type="text/css">
+    </head>
+    <body>
+   <div class="logotype">
+     <p align="center">Some logotype</p>
+   </div>
+   <div id="main">
+     <a href="http://localhost/mysite/allgoods.php" class="head" style="margin-left: 0px;">
+       <p align="center">Все товары</p>
+     </a>
+     <a href="http://localhost/mysite/forwomen.php" class="head">
+       <p align="center">Женщинам</p>
+     </a>
+     <a href="http://localhost/mysite/formen.php" class="head">
+       <p align="center">Мужчинам</p>
+     </a>
+     <a href="http://localhost/mysite/forkids.php" class="head">
+       <p align="center">Детям</p>
+     </a>
+     <a href="http://localhost/mysite/others.php" class="head" style="margin-right: 0px; border-right: 2px solid blue;">
+       <p align="center">Другое</p>
+     </a>
+   </div>
+   <section class="group">
+   <div class="accaunt">
+     <h3 align="center">
+       <?php
+       echo "Привет ", $_SESSION['log'];
+       //echo "<br>","You come ", $_SESSION['date'];
+       ?> </h3>
+    <div class="search">
+      <a href="http://localhost/mysite/search.php"><h3 align="center">Поиск</h3><a>
+    </div>
+    <div class="search">
+      <h3 align="center"><a href="http://localhost/mysite/stats.php">Статистика</a></h3>
+    </div>
+    <div class="quit">
+      <a href="http://localhost/mysite/logout.php">
+        <h3 align="center">Выход</h3>
+      </a>
+    </div>
+     </h3>
+   </div>
+   <div class="content">
+     <?php
+   if (isset($_POST['sub2'])) {
+      $name = $_POST['name'];
+      $cost = $_POST['cost'];
+      $rating = $_POST['rating'];
+      $description = $_POST['description'];
+      $variant = $_POST['variant'];
+      $href = $_POST['href'];
+      $admin = $_POST['admin'];
+        $sql = "UPDATE goods SET name='$name', cost='$cost', rating='$rating', description='$description', href='$href', idname='$variant', admin='$admin' WHERE id='$id'";
+        $write_in_table = mysqli_query($link, $sql);
+        if ($write_in_table == TRUE) {
+          echo "Вы успешно обновили базу данных", "<br>";
+        } else {
+          echo "Увы что-то по6шло не так", "<br>";
+        }
+      }
+      if (isset($_POST['del1'])) {
+        $sql = "SELECT * FROM img WHERE id_goods='$id'";
+        $result = mysqli_query($link, $sql);
+        $row = mysqli_fetch_assoc($result);
+        $img1 = $row['content'];
+        $img2 = $row['content2'];
+        $identification = $row['id'];
+        unlink('$img');
+        unlink('$img2');
+        $sql = "DELETE FROM img WHERE id_goods='$id'";
+        mysqli_query($link, $sql);
+        $sql = "INSERT INTO img (id, id_goods) VALUES ($identification, $id)";
+        mysqli_query($link, $sql);
+        $sql = "DELETE FROM goods WHERE id='$id'";
+        mysqli_query($link, $sql);
+        $sql = "INSERT INTO goods (id, admin) VALUES ('$id', '0')";
+        mysqli_query($link, $sql);
+        $sql = "DELETE FROM comments WHERE id_goods='$id'";
+        mysqli_query($link, $sql);
+      }
+      if (isset($_POST['sub3'])) {
+        $variant = $_SESSION['variant'];
+        unset($_SESSION['variant']);
+        if ($_FILES['img']['size'] > 1024*3*1024) {
+         echo "Операция загрузки главного изображений прервана. Размеры файла превышают 3 мегабайта", "<br>";
+       } elseif (is_uploaded_file($_FILES['img']['tmp_name'])) {
+         switch($variant)
+         {
+           case 'Мужчинам':
+           move_uploaded_file($_FILES['img']['tmp_name'], "content/formen/".$_FILES['img']['name']);
+           $way = "content/formen/".$_FILES['img']['name'];
+             break;
+           case 'Женщинам':
+           move_uploaded_file($_FILES['img']['tmp_name'], "content/forwomen/".$_FILES['img']['name']);
+           $way = "content/forwomen/".$_FILES['img']['name'];
+             break;
+           case 'Детям':
+             move_uploaded_file($_FILES['img']['tmp_name'], "content/forkids/".$_FILES['img']['name']);
+             $way = "content/forkids/".$_FILES['img']['name'];
+             break;
+           case 'Другое':
+               move_uploaded_file($_FILES['img']['tmp_name'], "content/others/".$_FILES['img']['name']);
+               $way = "content/others/".$_FILES['img']['name'];
+             break;
+      }
+  } else {
+    $way = "NULL";
+  }
+  $sql = "UPDATE img SET content='$way' WHERE id_goods='$id'";
+  $img_to_table = mysqli_query($link, $sql);
+  if ($img_to_table == TRUE) {
+    echo "Вы успешно добавили главную картинку";
+} else {
+  echo "Неудалось загрузить главное изображение";
+}
+    if ($_FILES['img2']['size'] < 1024*3*1024) {
+      if (is_uploaded_file($_FILES['img2']['tmp_name'])) {
+      switch($variant)
+      {
+        case 'Мужчинам':
+        move_uploaded_file($_FILES['img2']['tmp_name'], "content/formen/".$_FILES['img2']['name']);
+        $way2 = 'content/formen/'.$_FILES['img2']['name'];
+          break;
+        case 'Женщинам':
+        move_uploaded_file($_FILES['img2']['tmp_name'], "content/forwomen/".$_FILES['img2']['name']);
+        $way2 = "content/forwomen/".$_FILES['img2']['name'];
+          break;
+        case 'Детям':
+          move_uploaded_file($_FILES['img2']['tmp_name'], "content/forkids/".$_FILES['img2']['name']);
+          $way2 = "content/forkids/".$_FILES['img2']['name'];
+          break;
+        case 'Другое':
+            move_uploaded_file($_FILES['img2']['tmp_name'], "content/others/".$_FILES['img2']['name']);
+            $way2 = "content/others/".$_FILES['img2']['name'];
+          break;
+   }
+   $sql2 = "UPDATE img SET content2='$way2' WHERE id_goods='$id'";
+   $img2_to_table = mysqli_query($link, $sql2);
+   if ($img2_to_table == TRUE) {
+     echo "Дополнительное Изображение было добавлено";
+   } else {
+     echo "Не удалось загрузить дополнительное изображение";
+   }
+    } else {
+      $way2 = "NULL";
+      $sql2 = "UPDATE img SET content2='$way2' WHERE id_goods='$id'";
+      $img2_to_table = mysqli_query($link, $sql2);
+      echo "<br>", "Вы не добавили дополнительную картинку ничего страшного";
+    }
+  } else {
+    echo "Операция загрузки дополнительного изображения была прервана. Размер файла больше 3 Мегабайт";
+  }
+ }
+ echo "<br>", "<a href='http://localhost/mysite/admin.php'>Вернуться</a>";
+ ?>
+   </div>
+   </section>
+   <div class="footer">
+     <p align="center"> footer</p>
+   </div>
+    </body>
+  </html>
+  <?php
+  } else {
+     header("Location: http://localhost/mysite/allgoods.php");
+ }  ?>
