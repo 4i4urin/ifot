@@ -1,0 +1,116 @@
+<?php
+session_start();
+require('sesion.php');
+require('linkmysql.php');
+if ($_SESSION['level']>0) {
+?>
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Ифот</title>
+    <link rel="stylesheet" href="style.css" type="text/css">
+    <link rel="stylesheet" href="/mysite/content/styleimg.css">
+  </head>
+  <body>
+ <div class="logotype">
+   <p align="center">Some logotype</p>
+ </div>
+ <div id="main">
+   <a href="http://localhost/mysite/allgoods.php" class="head" style="margin-left: 0px;">
+     <p align="center">Все товары</p>
+   </a>
+   <a href="http://localhost/mysite/forwomen.php" class="head">
+     <p align="center">Женщинам</p>
+   </a>
+   <a href="http://localhost/mysite/formen.php" class="head">
+     <p align="center">Мужщинам</p>
+   </a>
+   <a href="http://localhost/mysite/forkids.php" class="head">
+     <p align="center">Детям</p>
+   </a>
+   <a href="http://localhost/mysite/others.php" class="head" style="margin-right: 0px; border-right: 2px solid blue;">
+     <p align="center">Другое</p>
+   </a>
+ </div>
+ <section class="group">
+ <div class="accaunt">
+   <h3 align="center">
+     <?php
+     echo "Привет ", $_SESSION['log'];
+     //echo "<br>","You come ", $_SESSION['date'];
+     ?> </h3>
+  <div class="search">
+    <a href="http://localhost/mysite/search.php"><h3 align="center">Поиск</h3><a>
+  </div>
+  <div class="quit">
+    <a href="http://localhost/mysite/logout.php">
+      <h3 align="center">Выход</h3>
+    </a>
+  </div>
+   </h3>
+ </div>
+ <div class="content">
+   <form action="" method="post">
+    <h3>Поставьте оценку товару от 0 до 5: <input tupe="text" name="rating" pattern="\d+(\.\d{1,3})?" required></h3>
+     <h3><textarea name="comment" cols="50" rows="10">Ваш комментарий</textarea></h3>
+     <input type="submit">
+   </form>
+   <?php
+   if (isset($_POST['rating'])) {
+     if ($_POST['comment'] === 'Ваш комментарий') {
+      unset($_POST['comment']);
+     }
+     if ($_POST['rating'] <= 5 & $_POST['rating'] >= 0) {
+    $id_goods = $_SESSION['id_goods'];
+    $user_name = $_SESSION['log'];
+    $rating = $_POST['rating'];
+    $rating = round($rating, 2);
+    $comment = $_POST['comment'];
+    $sql = "INSERT INTO comments (id_goods, user_name, rating, comment) VALUES ('$id_goods', '$user_name', '$rating', '$comment')";
+    $write_in_table = mysqli_query($link, $sql);
+    if ($write_in_table == TRUE) {
+      echo "<h3>Вы успешно оставили свою оценку</h3>";
+    } else {
+      echo "<h3>Увы что-то пошло не так. Попробуйте позже</h3>";
+    }
+   } else {
+      echo "<h3>Введите рейтинг корректно</h3>";
+     }
+   }
+   //Rating
+   $i=0;
+   $id_goods = $_SESSION['id_goods'];
+   $sql = "SELECT rating FROM comments WHERE id_goods='$id_goods'";
+   $result = mysqli_query($link, $sql);
+   while ($row = mysqli_fetch_array($result)) {
+     $rating = $row['rating'];
+     $monge[$i] = $rating;
+     $i++;
+   }
+   $k = $i++;
+   for ($i=0; $i < $k  ; $i++) {
+     $summ = $summ + $monge[$i];
+  }
+  $new_reting = $summ / $k;
+  $new_reting = round($new_reting, 2);
+  $sql = "UPDATE goods SET rating='$new_reting' WHERE id='$id_goods'";
+  mysqli_query($link, $sql);
+  ?>
+ </div>
+ </section>
+ <div class="footer">
+   <p align="center"> footer</p>
+   <?php if ($_SESSION['level'] === 3) { ?>
+   <a href="http://localhost/mysite/admin.php"><h3>ADMIN</h3></a>
+ <?php }
+ if ($_SESSION['level'] > 0) {?>
+   <a href="http://localhost/mysite/for_developer.php"><h3>Написать разработчику</h3></a>
+ <?php } ?>
+ </div>
+  </body>
+</html>
+<?php
+  } else {
+    header("Location: {$_SERVER['HTTP_REFERER']}");
+} ?>
