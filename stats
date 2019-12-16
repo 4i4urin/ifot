@@ -1,0 +1,110 @@
+<?php
+session_start();
+require('sesion.php');
+require('linkmysql.php');
+if ($_SESSION['level'] === 3) {
+?>
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Ифот</title>
+    <link rel="stylesheet" href="style.css" type="text/css">
+  </head>
+  <body>
+ <div class="logotype">
+   <p align="center">Some logotype</p>
+ </div>
+ <div id="main">
+   <a href="http://localhost/mysite/allgoods.php" class="head" style="margin-left: 0px;">
+     <p align="center">Все товары</p>
+   </a>
+   <a href="http://localhost/mysite/forwomen.php" class="head">
+     <p align="center">Женщинам</p>
+   </a>
+   <a href="http://localhost/mysite/formen.php" class="head">
+     <p align="center">Мужчинам</p>
+   </a>
+   <a href="http://localhost/mysite/forkids.php" class="head">
+     <p align="center">Детям</p>
+   </a>
+   <a href="http://localhost/mysite/others.php" class="head" style="margin-right: 0px; border-right: 2px solid blue;">
+     <p align="center">Другое</p>
+   </a>
+ </div>
+ <section class="group">
+ <div class="accaunt">
+   <h3 align="center">
+     <?php
+     echo "Привет ", $_SESSION['log'];
+     //echo "<br>","You come ", $_SESSION['date'];
+     ?> </h3>
+  <div class="search">
+    <a href="http://localhost/mysite/search.php"><h3 align="center">Поиск</h3><a>
+  </div>
+  <div class="quit">
+    <a href="http://localhost/mysite/logout.php">
+      <h3 align="center">Выход</h3>
+    </a>
+  </div>
+   </h3>
+ </div>
+ <div class="content">
+   <h4><table>
+     <tr>
+       <td>№</td> <td>Логин</td> <td>Почта</td> <td>Время входа</td> <td>Время выхода</td> <td>Кол - во кликов на сайте</td> <td>Последний клик</td>
+     </tr>
+   <?php
+   echo "<h3 align='center'>Статистика</h3>";
+   $sql = "SELECT * FROM userinf";
+   $result = mysqli_query($link, $sql);
+   $i = 0;
+   while ($row = mysqli_fetch_array($result)) {
+   $i++;
+   $login = $row['login'];
+   $email = $row['email'];
+   $time_login = $row['time_login'];
+   $time_logout = $row['time_logout'];
+   $cliks = $row['cliks'];
+   $last_clik = $row['last_clik'];
+   echo "<tr>
+     <td>$i</td> <td>$login</td> <td>$email</td> <td>$time_login</td> <td>$time_logout</td> <td>$cliks</td> <td>$last_clik</td>
+   </tr>";
+ } ?>
+</table></h4>
+<h3 align="center">Коментарии</h3>
+<h4><table>
+  <tr>
+    <td>Пользователь</td> <td>Почта</td> <td>Коментарий</td> <td>Время</td>
+  </tr>
+<?php
+ $sql = "SELECT * FROM developer";
+ $result = mysqli_query($link, $sql);
+ //var_dump($comment);
+ //$com = mysqli_fetch_array($comment);
+// var_dump($com);
+ //$com = mysqli_fetch_array($comment);
+ //var_dump($com);
+while ($row1 = mysqli_fetch_array($result)) {
+   $k++;
+  $user = $row1['user'];
+  $email = $row1['email'];
+  $comment = $row1['comment'];
+  $date = $row1['date'];
+  echo "<tr>
+     <td>$user</td> <td>$email</td> <td width=550px>$comment</td> <td>$date</td>
+  </tr>";
+ }
+    ?>
+  </table></h4>
+ </div>
+ </section>
+ <div class="footer">
+   <p align="center"> footer</p>
+ </div>
+  </body>
+</html>
+<?php
+ } else {
+    header("Location: http://localhost/mysite/allgoods.php");
+} ?>
