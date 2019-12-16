@@ -1,0 +1,90 @@
+<?php
+session_start();
+require('sesion.php');
+require('linkmysql.php');
+if ($_SESSION['level'] > 0) {
+?>
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Ифот</title>
+    <link rel="stylesheet" href="style.css" type="text/css">
+  </head>
+  <body>
+ <div class="logotype">
+   <p align="center">Some logotype</p>
+ </div>
+ <div id="main">
+   <a href="http://localhost/mysite/allgoods.php" class="head" style="margin-left: 0px;">
+     <p align="center">Все товары</p>
+   </a>
+   <a href="http://localhost/mysite/forwomen.php" class="head">
+     <p align="center">Женщинам</p>
+   </a>
+   <a href="http://localhost/mysite/formen.php" class="head">
+     <p align="center">Мужщинам</p>
+   </a>
+   <a href="http://localhost/mysite/forkids.php" class="head">
+     <p align="center">Детям</p>
+   </a>
+   <a href="http://localhost/mysite/others.php" class="head" style="margin-right: 0px; border-right: 2px solid blue;">
+     <p align="center">Другое</p>
+   </a>
+ </div>
+ <section class="group">
+ <div class="accaunt">
+   <h3 align="center">
+     <?php
+     echo "Привет ", $_SESSION['log'];
+     //echo "<br>","You come ", $_SESSION['date'];
+     ?> </h3>
+  <div class="search">
+    <a href="http://localhost/mysite/search.php"><h3 align="center">Поиск</h3><a>
+  </div>
+  <div class="quit">
+    <a href="http://localhost/mysite/logout.php">
+      <h3 align="center">Выход</h3>
+    </a>
+  </div>
+   </h3>
+ </div>
+ <div class="content">
+   <form class="" action="" method="post">
+     <h3><textarea name="developer" cols="50" rows="10">Что вы хотите написать разработчику</textarea></h3>
+     <input type="submit">
+   </form>
+   <?php
+   if (isset($_POST['developer']) & $_POST['developer'] != 'Что вы хотите написать разработчику') {
+     $text = $_POST['developer'];
+     $log = $_SESSION['log'];
+     $sql = "SELECT * FROM userinf WHERE login='$log'";
+     $res = mysqli_query($link, $sql);
+     $row = mysqli_fetch_assoc($res);
+     $email = $row['email'];
+     $time = date('d.m.y. H:i:s');
+     $sql = "INSERT INTO developer (user, email, comment, date) VALUE ('$log', '$email', '$text', '$time')";
+     $write_in_table = mysqli_query($link, $sql);
+     if ($write_in_table == TRUE) {
+       echo "Вы успешно оставили письмо разработчику";
+     } else {
+       echo "Увы что-то пошло не так";
+     }
+   } else {
+     echo "Заполните поле для ввода";
+   }
+    ?>
+ </div>
+ </section>
+ <div class="footer">
+   <p align="center"> footer</p>
+   <?php if ($_SESSION['level'] === 3) { ?>
+   <a href="http://localhost/mysite/admin.php"><h3>ADMIN</h3></a>
+ <?php } ?>
+ </div>
+  </body>
+</html>
+<?php
+  } else {
+    header("Location: {$_SERVER['HTTP_REFERER']}");
+} ?>
