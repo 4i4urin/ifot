@@ -1,0 +1,142 @@
+<?php
+session_start();
+require('sesion.php');
+require('linkmysql.php');
+if ($_SESSION['level'] === 3) {
+?>
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Ифот</title>
+    <link rel="stylesheet" href="style.css" type="text/css">
+  </head>
+  <body>
+ <div class="logotype">
+   <p align="center">Some logotype</p>
+ </div>
+ <div id="main">
+   <a href="http://localhost/mysite/allgoods.php" class="head" style="margin-left: 0px;">
+     <p align="center">Все товары</p>
+   </a>
+   <a href="http://localhost/mysite/forwomen.php" class="head">
+     <p align="center">Женщинам</p>
+   </a>
+   <a href="http://localhost/mysite/formen.php" class="head">
+     <p align="center">Мужчинам</p>
+   </a>
+   <a href="http://localhost/mysite/forkids.php" class="head">
+     <p align="center">Детям</p>
+   </a>
+   <a href="http://localhost/mysite/others.php" class="head" style="margin-right: 0px; border-right: 2px solid blue;">
+     <p align="center">Другое</p>
+   </a>
+ </div>
+ <section class="group">
+ <div class="accaunt">
+   <h3 align="center">
+     <?php
+     echo "Привет ", $_SESSION['log'];
+     //echo "<br>","You come ", $_SESSION['date'];
+     ?> </h3>
+  <div class="search">
+    <a href="http://localhost/mysite/search.php"><h3 align="center">Поиск</h3><a>
+  </div>
+  <div class="search">
+    <h3 align="center"><a href="http://localhost/mysite/stats.php">Статистика</a></h3>
+  </div>
+  <div class="quit">
+    <a href="http://localhost/mysite/logout.php">
+      <h3 align="center">Выход</h3>
+    </a>
+  </div>
+   </h3>
+ </div>
+ <div class="content">
+   <form action="" method="post">
+  <input type="text" name="id" value="id of goods">
+  <input type="submit" value="Отправить" name="sub1">
+  </form>
+  <?php
+  if (isset($_POST['sub1'])) {
+    $id = $_POST['id'];
+    $_SESSION['id'] = $id;
+    $sql = "SELECT * FROM goods WHERE id='$id'";
+    $result = mysqli_query($link, $sql);
+    $row = mysqli_fetch_assoc($result);
+    $name = $row['name'];
+    $cost = $row['cost'];
+    $rating = $row['rating'];
+    $description = $row['description'];
+    $variant = $row['idname'];
+    $href = $row['href'];
+    $admin = $row['admin'];
+    $_SESSION['variant'] = $variant;
+   ?>
+  <div class="chenging">
+    <form action="zzz.php" method="post">
+      <h3><?php echo $id; ?></h3>
+      <h3>
+      <input type="text" name="name" value="<?php echo $name; ?>">
+      <input type="text" name="cost" value="<?php echo $cost; ?>" pattern="\d+">
+      <input type="text" name="rating" value="<?php echo $rating; ?>" pattern="\d+(\.\d{1,3})?">
+      <select name="variant">
+        <?php
+        if ($variant == "Мужчинам") { ?>
+          <option value="Мужчинам" selected>Мужчинам</option>
+          <option value="Женщинам">Женщинам</option>
+          <option value="Детям">Детям</option>
+          <option value="Другое">Другое</option>
+      <?php  } elseif ($variant == 'Женщинам') { ?>
+        <option value="Мужчинам">Мужчинам</option>
+        <option value="Женщинам" selected>Женщинам</option>
+        <option value="Детям">Детям</option>
+        <option value="Другое">Другое</option>.
+      <?php  } elseif ($variant == 'Детям') { ?>
+        <option value="Мужчинам">Мужчинам</option>
+        <option value="Женщинам">Женщинам</option>
+        <option value="Детям" selected>Детям</option>
+        <option value="Другое">Другое</option>
+      <?php } else { ?>
+        <option value="Мужчинам">Мужчинам</option>
+        <option value="Женщинам">Женщинам</option>
+        <option value="Детям">Детям</option>
+        <option value="Другое" selected>Другое</option>
+      <?php } ?>
+      </select>
+      <!--<input type="text" name="variant" value="<?php echo $variant; ?>">-->
+      <textarea name="description" cols="50" rows="10"><?php echo $description; ?></textarea> <br>
+      <input type="text" name="href" style="width: 350px;" value="<?php echo $href; ?>">
+      <select name="admin">
+        <?php if ($admin == 1) { ?>
+          <option value="1" selected>Показать</option>
+          <option value="0">Скрыть</option>
+        <?php } else { ?>
+          <option value="1">Показать</option>
+          <option value="0" selected>Скрыть</option>
+        <?php } ?>
+      </select>
+      <!--<input type="text" name="admin" value="<?php echo $admin; ?>"></h3>-->
+      <input type="submit" style="display: block" value="Подтвердить" name="sub2">
+    </form>
+    <h3>Изменить изображение?</h3>
+    <form action="zzz.php" method="post" enctype="multipart/form-data">
+      <h3>Изменить главное изображение<input type="file" name="img" accept="image/*"></h3> <br>
+      <h3>Изменить дополнительное изображение<input type="file" name="img2" accept="image/*"></h3> <br>
+      <input type="submit" style="margin: 10px;" name="sub3" value="Загрузить картинки"> <br>
+      <h3>Удалить все<input type="submit" name="del1" value="Удалить"></h3> <br>
+    </form>
+    </div>
+  <?php } ?>
+ </div>
+ </section>
+ <div class="footer">
+   <p align="center"> footer</p>
+ </div>
+  </body>
+</html>
+<?php
+ } else {
+    header("Location: http://localhost/mysite/allgoods.php");
+} ?>
+
