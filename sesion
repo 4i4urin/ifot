@@ -1,0 +1,21 @@
+<?php
+session_start();
+if (!isset($_SESSION['log'])) {
+  $lvl = 0;
+} elseif ($_SESSION['log'] == 'admin1') {
+  $lvl = 3;
+} else {
+  $lvl = 1;
+}
+$_SESSION['level'] = $lvl;
+$name = $_SESSION['log'];
+require('linkmysql.php');
+$sql = "SELECT cliks FROM userinf WHERE login='$name'";
+$result = mysqli_query($link, $sql);
+$row = mysqli_fetch_assoc($result);
+$i = $row['cliks'];
+$i = $i + 1;
+$date = date('d.m.Y H:i:s');
+$sql = "UPDATE userinf SET cliks='$i', last_clik='$date' WHERE login='$name'";
+$result = mysqli_query($link, $sql);
+?>
