@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Ифот</title>
+    <link rel="stylesheet" href="style.css" type="text/css">
+  </head>
+  <body>
+ <div class="logotype">
+   <p align="center">Some logotype</p>
+ </div>
+ <div id="main">
+   <a href="http://localhost/mysite/allgoods.php" class="head" style="margin-left: 0px;">
+     <p align="center">Все товары</p>
+   </a>
+   <a href="http://localhost/mysite/forwomen.php" class="head">
+     <p align="center">Женщинам</p>
+   </a>
+   <a href="http://localhost/mysite/formen.php" class="head">
+     <p align="center">Мужщинам</p>
+   </a>
+   <a href="http://localhost/mysite/forkids.php" class="head">
+     <p align="center">Детям</p>
+   </a>
+   <a href="http://localhost/mysite/others.php" class="head" style="margin-right: 0px; border-right: 2px solid blue;">
+     <p align="center">Другое</p>
+   </a>
+ </div>
+ <section class="group">
+ <div class="content" style="width: 100%">
+<?php
+session_start();
+require('/var/www/html/mysite/linkmysql.php');
+$date = date('d.m.Y H:i:s');
+$log = $_SESSION['log'];
+$sql = "UPDATE userinf SET time_logout='$date' WHERE login='$log'";
+mysqli_query($link, $sql);
+unset($_SESSION['log']);
+unset($_SESSION['date']);
+unset($_SESSION['level']);
+session_destroy();
+session_unset();
+ ?>
+<h2 align="center">Пока</h2>
+<h3 align="center">Надеюсь увидимся снова</h3>
+<h3 align="center"><a href="http://localhost/mysite/login/login.php">Авторизоваться снова</a></h3>
+<h3 align="center"><a href="http://localhost/mysite/regestration/registration.php">Зарегистрировать нового пользователя</a></h3>
+ </div>
+</section>
+ <div class="footer">
+   <p align="center"> footer</p>
+ </div>
+  </body>
+</html>
