@@ -1,0 +1,258 @@
+<?php session_start();
+if ($_SESSION['level'] > 0) {
+?>
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Ифот поиск</title>
+    <link rel="stylesheet" href="style.css" type="text/css">
+    <style>
+    IMG.displayed {
+      display: block;
+      margin-top: 15px;
+      margin-left: auto;
+      margin-right: auto;
+      width: 215px;
+      height: 215px;
+    }
+    </style>
+  </head>
+  <body>
+ <div class="logotype">
+   <p align="center">Some logotype</p>
+ </div>
+ <div id="main">
+   <a href="http://localhost/mysite/allgoods.php" class="head" style="margin-left: 0px;">
+     <p align="center">Все товары</p>
+   </a>
+   <a href="http://localhost/mysite/forwomen.php" class="head">
+     <p align="center">Женщинам</p>
+   </a>
+   <a href="http://localhost/mysite/formen.php" class="head">
+     <p align="center">Мужщинам</p>
+   </a>
+   <a href="http://localhost/mysite/forkids.php" class="head">
+     <p align="center">Детям</p>
+   </a>
+   <a href="http://localhost/mysite/others.php" class="head" style="margin-right: 0px; border-right: 2px solid blue;">
+     <p align="center">Другое</p>
+   </a>
+ </div>
+ <section style="background-color: ghostwhite;">
+ <div class="accaunt">
+   <h3 align="center">
+     <?php
+     echo "Привет ", $_SESSION['log'];
+     //echo "<br>","You come ", $_SESSION['date'];
+     ?>
+   </h3>
+  <div class="quit">
+  <a href="http://localhost/mysite/logout.php">
+    <h3 align="center">Выход</h3>
+  </a>
+  </div>
+ </div>
+ <div class="content">
+   <form action="" method="get">
+     <h2 align="center">Что вы ищете?</h2>
+     <input type="text" name="zapros" value=""><select class="" name="type">
+       <option value="name">По имени</option>
+       <option value="cost">По цене</option>
+       <option value="rating">По рейтингу</option>
+       <option value="type">По каталогам</option>
+     </select>
+     <input type="submit" value="Искать">
+   </form>
+   <?php
+   require('/var/www/html/mysite/linkmysql.php');
+   $name = $_GET['zapros'];
+   $type = $_GET['type'];
+   if ($type == 'name') {
+     $sql = "SELECT * FROM goods WHERE name LIKE '%$name%'";
+     $search_mysql = mysqli_query($link, $sql);
+       while ($row = mysqli_fetch_array($search_mysql)) {
+       $tr = $row['admin'];
+       if ($tr == 1 ) {
+         $id = $row['id']; ?>
+         <a href="<?php echo $row['href']; ?>">
+          <div class="one_block">
+            <?php
+            $sql = "SELECT * FROM img WHERE id_goods='$id'";
+            $result = mysqli_query($link, $sql);
+            $picture = mysqli_fetch_array($result);
+            $img = $picture['content'];
+             ?>
+           <img class="displayed" src="<?php echo $img; ?>" alt="Some img">
+           <h3><?php echo $row['name']; ?></h3>
+           <h3>Цена:
+             <?php
+              echo $row['cost'], " рублей";
+              ?>
+           </h3>
+           <h3>Рейтинг:
+             <?php
+              echo $row['rating'];
+               ?>
+            из 5</h3>
+          </div>
+        </a> <?php
+       /*$name = $row['name'];
+       $cost = $row['cost'];
+       $rating = $row['rating'];
+       $variant = $row['idname'];
+       $href = $row['href'];
+       echo "<h3>$id $name Цена: $cost Рейтинг: $rating Из какталога: $variant  <a href='$href'>ссылка</a></h3>";*/
+     }
+       }
+   } elseif ($type == 'cost') {
+     if (stristr($name, '>')) {
+       $name_sql = substr($name, 1);
+       $sql = "SELECT * FROM goods WHERE cost>'$name_sql'";
+     } elseif (stristr($name, '<')) {
+       $name_sql = substr($name, 1);
+       $sql = "SELECT * FROM goods WHERE cost<'$name_sql'";
+     } else {
+       $sql = "SELECT * FROM goods WHERE cost='$name'";
+     }
+     $search_mysql = mysqli_query($link, $sql);
+     while ($row = mysqli_fetch_array($search_mysql)) {
+       $tr = $row['admin'];
+       if ($tr['admin'] == 1 ) {
+       $id = $row['id'];
+       ?>
+       <a href="<?php echo $row['href']; ?>">
+        <div class="one_block">
+          <?php
+          $sql = "SELECT * FROM img WHERE id_goods='$id'";
+          $picture = mysqli_query($link, $sql);
+          $picture = mysqli_fetch_array($picture);
+          $img = $picture['content'];
+           ?>
+         <img class="displayed" src="<?php echo $img; ?>" alt="Some img">
+         <h3><?php echo $row['name']; ?></h3>
+         <h3>Цена:
+           <?php
+            echo $row['cost'], " рублей";
+            ?>
+         </h3>
+         <h3>Рейтинг:
+           <?php
+            echo $row['rating'];
+             ?>
+          из 5</h3>
+        </div>
+      </a>
+       <?php
+       /*$name = $row['name'];
+       $cost = $row['cost'];
+       $variant = $row['idname'];
+       $rating = $row['rating'];
+       $href = $row['href'];
+       echo "<h3>$name Цена: $cost Рейтинг: $rating Из какталога: $variant  <a href='$href'>ссылка</a></h3>";*/
+     }
+   }
+   } elseif ($type == 'rating') {
+     if (stristr($name, '>')) {
+       $name_sql = substr($name, 1);
+       $sql = "SELECT * FROM goods WHERE rating>'$name_sql'";
+     } elseif (stristr($name, '<')) {
+       $name_sql = substr($name, 1);
+       $sql = "SELECT * FROM goods WHERE rating<'$name_sql'";
+     } else {
+       $sql = "SELECT * FROM goods WHERE rating='$name'";
+     }
+     $search_mysql = mysqli_query($link, $sql);
+     while ($row = mysqli_fetch_array($search_mysql)) {
+       $tr = $row['admin'];
+       if ($tr['admin'] == 1 ) {
+       $id = $row['id'];
+       ?>
+       <a href="<?php echo $row['href']; ?>">
+        <div class="one_block">
+          <?php
+          $sql = "SELECT * FROM img WHERE id_goods='$id'";
+          $picture = mysqli_query($link, $sql);
+          $picture = mysqli_fetch_array($picture);
+          $img = $picture['content'];
+           ?>
+         <img class="displayed" src="<?php echo $img; ?>" alt="Some img">
+         <h3><?php echo $row['name']; ?></h3>
+         <h3>Цена:
+           <?php
+            echo $row['cost'], " рублей";
+            ?>
+         </h3>
+         <h3>Рейтинг:
+           <?php
+            echo $row['rating'];
+             ?>
+          из 5</h3>
+        </div>
+      </a> <?php
+       /*$name = $row['name'];
+       $cost = $row['cost'];
+       $rating = $row['rating'];
+       $variant = $row['idname'];
+       $href = $row['href'];
+       echo "<h3>$name Цена: $cost Рейтинг: $rating Из какталога: $variant  <a href='$href'>ссылка</a></h3>";*/
+     }
+    }
+   } else {
+     $sql = "SELECT * FROM goods WHERE idname LIKE '%$name%'";
+     $search_mysql = mysqli_query($link, $sql);
+     while ($row = mysqli_fetch_array($search_mysql)) {
+       $tr = $row['admin'];
+       if ($tr['admin'] == 1 ) {
+       $id = $row['id'];
+       ?>
+       <a href="<?php echo $row['href']; ?>">
+        <div class="one_block">
+          <?php
+          $sql = "SELECT * FROM img WHERE id_goods='$id'";
+          $picture = mysqli_query($link, $sql);
+          $picture = mysqli_fetch_array($picture);
+          $img = $picture['content'];
+           ?>
+         <img class="displayed" src="<?php echo $img; ?>" alt="Some img">
+         <h3><?php echo $row['name']; ?></h3>
+         <h3>Цена:
+           <?php
+            echo $row['cost'], " рублей";
+            ?>
+         </h3>
+         <h3>Рейтинг:
+           <?php
+            echo $row['rating'];
+             ?>
+          из 5</h3>
+        </div>
+      </a> <?php
+       /*$name = $row['name'];
+       $cost = $row['cost'];
+       $rating = $row['rating'];
+       $variant = $row['idname'];
+       $href = $row['href'];
+       echo "<h3>$name Цена: $cost Рейтинг: $rating Из какталога: $variant  <a href='$href'>ссылка</a></h3>";*/
+       }
+     }
+   }
+   ?>
+ </div>
+ </section>
+ <div class="footer">
+   <p align="center"> footer</p>
+   <?php if ($_SESSION['level'] === 3) { ?>
+   <a href="http://localhost/mysite/admin.php"><h3>ADMIN</h3></a>
+ <?php }
+ if ($_SESSION['level'] > 0) {?>
+   <a href="http://localhost/mysite/for_developer.php"><h3>Написать разработчику</h3></a>
+ <?php } ?>
+ </div>
+  </body>
+</html>
+<?php
+ } else {
+  header("Location: {$_SERVER['HTTP_REFERER']}");
+ }
+?>
